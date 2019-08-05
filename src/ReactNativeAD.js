@@ -1,5 +1,6 @@
 // @flow
 import React, {WebView, Dimensions, AsyncStorage} from 'react-native'
+import SecureStore from 'react-native-secure-storage';
 import CONST from './const.js'
 import Timer from 'react-timer-mixin'
 import log from './logger'
@@ -93,13 +94,17 @@ export default class ReactNativeAD {
 
       Object.assign(this.credentials,  data)
 
-      AsyncStorage.multiSet(pairs, (err) => {
-        log.verbose('saveCredentials', 'done', this.credentials)
-        if(err)
-          reject(err)
-        else
-          resolve()
-      })
+      // AsyncStorage.multiSet(pairs, (err) => {
+      //   log.verbose('saveCredentials', 'done', this.credentials)
+      //   if(err)
+      //     reject(err)
+      //   else
+      //     resolve()
+      // })
+      pairs.map((result, i, store) => {
+        SecureStore.setItem(store[i][0], store[i][1]).catch(err => reject(err))
+      }).then(r => resolve())
+      
       console.log(this.credentials)
     })
   }
@@ -198,7 +203,8 @@ export default class ReactNativeAD {
       // When in memory context not found, check AsyncStorage.
       if(!cachedCred || cachedCred === void 0) {
         try{
-          AsyncStorage.getItem(resourceKey)
+          // AsyncStorage.getItem(resourceKey)
+          SecureStore.getItem(resourceKey)
               .then((credStr) => {
                 log.debug(`checkCredential from AsyncStorage data=${credStr}`)
                 // Do not have any access record about this resource, need manual login
@@ -265,7 +271,8 @@ export default class ReactNativeAD {
           let cacheKey = _getResourceKey(this.config, params.resource)
           if(cred.response.access_token) {
             log.debug(`save credential ${cacheKey} `, cred.response)
-            AsyncStorage.setItem(cacheKey, JSON.stringify(cred.response))
+            // AsyncStorage.setItem(cacheKey, JSON.stringify(cred.response))
+            SecureStore.setItem(cacheKey, JSON.stringify(cred.response))
             // truncate prefix
             resolve(cred)
           } else {
