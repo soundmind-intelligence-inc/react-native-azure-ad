@@ -1,6 +1,6 @@
 {
   "name": "react-native-azure-ad-soundmind",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Azure AD authentication library implementation uses pure react native API (no native library needed).",
   "main": "src/index.js",
   "scripts": {
